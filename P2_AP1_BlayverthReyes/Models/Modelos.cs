@@ -6,4 +6,6 @@ public class Modelos
 {
     [Key]
     public int Id { get; set; }
+
+    public DateTime Fecha { get; set; } = DateTime.Now;
 }

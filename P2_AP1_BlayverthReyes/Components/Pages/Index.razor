@@ -1,0 +1,132 @@
+﻿@page "/index"
+
+@inject ModelosService modelosService
+@rendermode InteractiveServer
+
+<div class="container">
+	<div class="card shadow-lg">
+		<div class="card-header text-center">
+			<h5 class="card-title">Index</h5>
+		</div>
+
+		<div class="card-body">
+			@*Labels*@
+			<div class="row">
+				<div class="col-2">
+					<label class="col-form-label"><strong>Desde</strong></label>
+				</div>
+
+				<div class="col-3">
+					<label class="col-form-label"><strong>Hasta</strong></label>
+				</div>
+			</div>
+
+			@*Inputs*@
+			<div class="row">
+				<div class="col-2">
+					<InputDate class="form-control" @bind-Value="FechaDesde" />
+				</div>
+
+				<div class="col-3">
+					<InputDate class="form-control w-75" @bind-Value="FechaHasta" />
+				</div>
+			</div>
+
+			@*Labels*@
+			<div class="row">
+				<div class="col-3">
+					<label class="col-form-label"><strong>Filtar por</strong></label>
+				</div>
+
+				<div class="col-4">
+					<label class="col-form-label"><strong>Buscar</strong></label>
+				</div>
+			</div>
+
+			@*Inputs y buttons*@
+			<div class="row align-items-center">
+				<div class="col-3">
+					<InputSelect class="form-select" @bind-value="Filtro">
+						<option value="" selected disabled>Elige una opci&oacute;n</option>
+						<option value="Id">Id</option>
+					</InputSelect>
+				</div>
+
+				<div class="col-4">
+					<div class="input-group">
+						<input class="form-control" @bind="ValorFiltro" placeholder="Buscar" />
+						<button type="button" class="btn btn-outline-primary" @onclick="Buscar"><span class="bi bi-search" /></button>
+						<button type="reset" class="btn btn-outline-secondary" @onclick="Restablecer"><span class="bi bi-arrow-counterclockwise" /></button>
+					</div>
+				</div>
+			</div>
+
+			@*Tabla*@
+			<table class="table table-hover">
+				@*Encabezados de la tabla*@
+				<thead class="table table-striped text-black">
+					<tr>
+						<th>Id</th>
+						<th>Fecha</th>
+					</tr>
+				</thead>
+				@*Datos de la tabla*@
+				<tbody>
+					@foreach (var entrada in ListaModelos)
+					{
+						<tr>
+							<td>@entrada.Id</td>
+							<td>@entrada.Fecha.ToString("dd/MM/yyyy")</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+
+		@*Footer*@
+		<div class="card-footer">
+			<label><strong>Cantidad: </strong>@ListaModelos.Count()</label>
+		</div>
+	</div>
+</div>
+
+@code {
+	public List<Modelos> ListaModelos { get; set; } = new List<Modelos>();
+
+	public string Filtro { get; set; } = string.Empty;
+	public string ValorFiltro { get; set; } = string.Empty;
+	public DateTime? FechaDesde { get; set; } = null;
+	public DateTime? FechaHasta { get; set; } = null;
+
+	protected override async Task OnInitializedAsync()
+	{
+		ListaModelos = await modelosService.Listar(e => e.Id > 0);
+	}
+
+	public async Task Buscar()
+	{
+		if (ValorFiltro.Trim() != "" || (FechaDesde.HasValue || FechaHasta.HasValue))
+		{
+			if (Filtro == "Id")
+				ListaModelos = await modelosService.Listar(e => e.Id.ToString().Contains(ValorFiltro.Trim()));
+
+			if (FechaDesde.HasValue && FechaHasta.HasValue)
+				ListaModelos = ListaModelos.Where(e => e.Fecha >= FechaDesde && e.Fecha <= FechaHasta).ToList();
+			else if (FechaDesde.HasValue)
+				ListaModelos = ListaModelos.Where(e => e.Fecha >= FechaDesde).ToList();
+			else if (FechaHasta.HasValue)
+				ListaModelos = ListaModelos.Where(e => e.Fecha <= FechaHasta).ToList();
+		}
+		else
+			ListaModelos = await modelosService.Listar(e => e.Id > 0);
+	}
+
+	public async Task Restablecer()
+	{
+		ListaModelos = await modelosService.Listar(e => e.Id > 0);
+		ValorFiltro = string.Empty;
+		Filtro = string.Empty;
+		FechaDesde = null;
+		FechaHasta = null;
+	}
+}

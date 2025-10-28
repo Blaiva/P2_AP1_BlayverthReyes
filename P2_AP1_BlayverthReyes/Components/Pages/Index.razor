@@ -59,6 +59,10 @@
 						<button type="reset" class="btn btn-outline-secondary" @onclick="Restablecer"><span class="bi bi-arrow-counterclockwise" /></button>
 					</div>
 				</div>
+
+				<div class="col-5">
+					<a href="/create" class="btn btn-primary"><span class="bi bi-plus-square" /> Crear</a>
+				</div>
 			</div>
 
 			@*Tabla*@
@@ -68,15 +72,20 @@
 					<tr>
 						<th>Id</th>
 						<th>Fecha</th>
+						<th>Opciones</th>
 					</tr>
 				</thead>
 				@*Datos de la tabla*@
 				<tbody>
-					@foreach (var entrada in ListaModelos)
+					@foreach (var modelo in ListaModelos)
 					{
 						<tr>
-							<td>@entrada.Id</td>
-							<td>@entrada.Fecha.ToString("dd/MM/yyyy")</td>
+							<td>@modelo.Id</td>
+							<td>@modelo.Fecha.ToString("dd/MM/yyyy")</td>
+
+							<td>
+								<a href="/create/@modelo.Id" class="btn btn-outline-primary"><span class="bi bi-pencil" /></a>
+							</td>
 						</tr>
 					}
 				</tbody>

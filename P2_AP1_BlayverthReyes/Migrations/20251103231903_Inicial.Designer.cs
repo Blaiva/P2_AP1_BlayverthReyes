@@ -11,7 +11,7 @@ using P2_AP1_BlayverthReyes.DAL;
 namespace P2_AP1_BlayverthReyes.Migrations
 {
     [DbContext(typeof(Contexto))]
-    [Migration("20251103230014_Inicial")]
+    [Migration("20251103231903_Inicial")]
     partial class Inicial
     {
         /// <inheritdoc />

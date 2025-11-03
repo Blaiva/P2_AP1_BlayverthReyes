@@ -7,7 +7,7 @@ public class Contexto : DbContext
 {
     public Contexto(DbContextOptions options) : base(options) {}
 
-    public DbSet<Pedidos> Modelos { get; set; }
+    public DbSet<Pedidos> Pedidos { get; set; }
     public DbSet<Componentes> Componentes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

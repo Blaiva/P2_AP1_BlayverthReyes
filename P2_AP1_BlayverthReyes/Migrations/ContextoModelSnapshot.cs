@@ -104,7 +104,7 @@ namespace P2_AP1_BlayverthReyes.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Modelos");
+                    b.ToTable("Pedidos");
                 });
 
             modelBuilder.Entity("P2_AP1_BlayverthReyes.Models.PedidoDetalles", b =>

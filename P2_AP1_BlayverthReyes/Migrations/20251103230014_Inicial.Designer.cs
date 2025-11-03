@@ -11,7 +11,7 @@ using P2_AP1_BlayverthReyes.DAL;
 namespace P2_AP1_BlayverthReyes.Migrations
 {
     [DbContext(typeof(Contexto))]
-    [Migration("20251103223854_Inicial")]
+    [Migration("20251103230014_Inicial")]
     partial class Inicial
     {
         /// <inheritdoc />
@@ -107,7 +107,7 @@ namespace P2_AP1_BlayverthReyes.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Modelos");
+                    b.ToTable("Pedidos");
                 });
 
             modelBuilder.Entity("P2_AP1_BlayverthReyes.Models.PedidoDetalles", b =>

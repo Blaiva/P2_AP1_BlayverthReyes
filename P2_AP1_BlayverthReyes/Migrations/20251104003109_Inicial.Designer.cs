@@ -11,7 +11,7 @@ using P2_AP1_BlayverthReyes.DAL;
 namespace P2_AP1_BlayverthReyes.Migrations
 {
     [DbContext(typeof(Contexto))]
-    [Migration("20251103223854_Inicial")]
+    [Migration("20251104003109_Inicial")]
     partial class Inicial
     {
         /// <inheritdoc />
@@ -33,8 +33,8 @@ namespace P2_AP1_BlayverthReyes.Migrations
                     b.Property<int>("Existencia")
                         .HasColumnType("INTEGER");
 
-                    b.Property<decimal>("Precio")
-                        .HasColumnType("TEXT");
+                    b.Property<double>("Precio")
+                        .HasColumnType("REAL");
 
                     b.HasKey("ComponenteId");
 
@@ -46,21 +46,21 @@ namespace P2_AP1_BlayverthReyes.Migrations
                             ComponenteId = 1,
                             Descripcion = "Memoria 4GB",
                             Existencia = 1,
-                            Precio = 1580m
+                            Precio = 1580.0
                         },
                         new
                         {
                             ComponenteId = 2,
                             Descripcion = "Disco SSD 120MB",
                             Existencia = 8,
-                            Precio = 4200m
+                            Precio = 4200.0
                         },
                         new
                         {
                             ComponenteId = 3,
                             Descripcion = "Tarjeta de Video",
                             Existencia = 4,
-                            Precio = 10000m
+                            Precio = 10000.0
                         });
                 });
 
@@ -107,7 +107,7 @@ namespace P2_AP1_BlayverthReyes.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Modelos");
+                    b.ToTable("Pedidos");
                 });
 
             modelBuilder.Entity("P2_AP1_BlayverthReyes.Models.PedidoDetalles", b =>

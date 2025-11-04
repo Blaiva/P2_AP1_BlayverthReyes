@@ -1,0 +1,203 @@
+﻿@page "/upsert/{PedidoId:int}"
+
+@inject PedidosService pedidosService
+@inject NavigationManager navigationManager
+@rendermode InteractiveServer
+
+<PageTitle>@crear pedido</PageTitle>
+
+<EditForm Model="Pedido" OnValidSubmit="Guardar">
+	<DataAnnotationsValidator/>
+
+	<div class="container">
+		<div class="card shadow-lg">
+			@*Header*@
+			<div class="card-header text-center">
+				<h5 class="card-title">@crear pedido</h5>
+			</div>
+
+			@*Body*@
+			<div class="card-body">
+
+				<div class="row">
+					<div class="col-3">
+						<div class="mb-3">
+							<label class="form-label"><strong>Id</strong></label>
+							<InputNumber readonly class="form-control" @bind-Value="Pedido.Id" />
+						</div>
+					</div>
+					
+					<div class="col-4">
+						<div class="mb-3">
+							<label class="form-label"><strong>Fecha</strong></label>
+							<InputDate class="form-control" @bind-Value="Pedido.Fecha" />
+							<ValidationMessage For="@(() => Pedido.Fecha)" />
+						</div>
+					</div>
+				</div>
+				
+				<div class="mb-3">
+					<label class="form-label"><strong>Nombre del Cliente</strong></label>
+					<InputText class="form-control" @bind-Value="Pedido.NombreCliente" />
+					<ValidationMessage For="@(() => Pedido.NombreCliente)" />
+				</div>
+
+				<div class="border border-success p-3 mt-3">
+					<h5>Detalles del Pedido</h5>
+
+					<div class="row">
+						<div class="col-3">
+							<label class="col-form-label">Componente:</label>
+						</div>
+						
+						<div class="col-4">
+							<label class="col-form-label">Precio:</label>
+						</div>
+
+						<div class="col-5">
+							<label class="col-form-label">Cantidad:</label>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-3">
+							<InputSelect class="form-select" @bind-Value="Detalle.ComponenteId">
+								<option disabled value="0">Seleccione un Componente</option>
+								@foreach (var componente in ListaComponentes)
+								{
+									<option value="@componente.ComponenteId">@componente.Descripcion - @componente.Existencia</option>
+								}
+							</InputSelect>
+						</div>
+						
+						<div class="col-4">
+							<InputNumber class="form-control" readonly @bind-Value="Detalle.Precio" />
+						</div>
+						
+						<div class="col-5">
+							<div class="input-group">
+								<InputNumber class="form-control" id="quantity-input" @bind-Value="Detalle.Cantidad" />
+								<button type="button" class="btn btn-outline-success" @onclick="AgregarDetalle"><span class="bi bi-plus" /></button>
+							</div>	
+						</div>
+					</div>
+
+					<table class="table table-light">
+						<thead class="table table-striped table-bordered">
+							<tr class="text-center">
+								<th>ComponenteId</th>
+								<th>Descripcion</th>
+								<th>Cantidad</th>
+								<th>Precio</th>
+								<th>Importe</th>
+								<th>Remover</th>
+							</tr>
+						</thead>
+						<tbody>
+							@foreach(var detalle in Pedido.Detalles)
+							{
+								<tr class="text-center">
+									<td>@detalle.ComponenteId</td>
+									<td>@ListaComponentes.FirstOrDefault(t => t.ComponenteId == detalle.ComponenteId)?.Descripcion</td>
+									<td>@detalle.Cantidad</td>
+									<td>RD$@Math.Round(detalle.Precio, 2)</td>
+									<td>RD$@Math.Round(detalle.Cantidad*detalle.Precio)</td>
+									<td>
+										<button type="button" class="btn btn-outline-danger" @onclick="() => RemoverDetalle(detalle)"><span class="bi bi-trash"/></button>
+									</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+					<hr/>
+				</div>
+
+				<div class="row">
+					<div class="col-3 offset-9">
+						<div class="mb-3">
+							<label class="form-label"><strong>Total</strong></label>
+							<label class="form-control text-end"><strong>RD$@Math.Round(Pedido.Total, 2)</strong></label>
+							<ValidationMessage For="@(() => Pedido.Total)" />
+						</div>
+					</div>
+
+				</div>
+			</div>
+
+			@*Footer*@
+			<div class="card-footer text-center">
+				<div class="btn-group">
+					<a href="/index" class="btn btn-outline-secondary"><span class="bi bi-arrow-bar-left"/> Volver</a>
+					<button type="submit" class="btn btn-outline-success"><span class="bi bi-check-circle" /> Guardar</button>
+					@if(crear == "Editar")
+					{
+						<button type="button" class="btn btn-outline-danger" @onclick="Eliminar"><span class="bi bi-trash" /> Eliminar</button>
+					}
+				</div>
+			</div>
+		</div>
+	</div>
+</EditForm>
+
+@code {
+	[Parameter]
+	public int PedidoId { get; set; }
+	public string crear { get; set; }
+	public Pedidos Pedido { get; set; } = new Pedidos();
+	public PedidoDetalles Detalle = new();
+	public List<Componentes> ListaComponentes { get; set; } = [];
+	public bool modificado { get; set; } = false;
+
+	protected override async Task OnInitializedAsync()
+	{
+		crear = PedidoId == 0 ? "Crear" : "Editar";
+		if (PedidoId > 0)
+		{
+			Pedido = await pedidosService.Buscar(PedidoId);
+		}
+		ListaComponentes = await pedidosService.ListarComponentes();
+	}
+
+	private void AgregarDetalle()
+	{
+		Detalle.Precio = (ListaComponentes.FirstOrDefault(e => e.ComponenteId == Detalle.ComponenteId)).Precio;
+		if (Detalle.ComponenteId < 1)
+		{
+			return;
+		}
+		else if (Detalle.Cantidad < 1)
+		{
+			return;
+		}
+		else if (Detalle.Precio < 0.01)
+		{
+			return;
+		}
+		Pedido.Detalles.Add(Detalle);
+		Pedido.Total = Pedido.Detalles.Sum(d => d.Cantidad * d.Precio);
+		Detalle = new PedidoDetalles();
+	}
+
+	public void RemoverDetalle(PedidoDetalles detalle)
+	{
+		Pedido.Detalles.Remove(detalle);
+		Pedido.Total = Pedido.Detalles.Sum(d => d.Cantidad * d.Precio);
+		Detalle = detalle;
+	}
+
+	public async Task Guardar()
+	{
+		modificado = await pedidosService.Guardar(Pedido);
+		if (modificado)
+		{
+			navigationManager.NavigateTo("/index");
+		}
+	}
+
+	public async Task Eliminar()
+	{
+		modificado = await pedidosService.Eliminar(PedidoId);
+		if (modificado)
+			navigationManager.NavigateTo("/index");
+	}
+}

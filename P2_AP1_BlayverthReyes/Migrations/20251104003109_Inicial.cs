@@ -20,7 +20,7 @@ namespace P2_AP1_BlayverthReyes.Migrations
                     ComponenteId = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Descripcion = table.Column<string>(type: "TEXT", nullable: false),
-                    Precio = table.Column<decimal>(type: "TEXT", nullable: false),
+                    Precio = table.Column<double>(type: "REAL", nullable: false),
                     Existencia = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
@@ -29,7 +29,7 @@ namespace P2_AP1_BlayverthReyes.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Modelos",
+                name: "Pedidos",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
@@ -40,7 +40,7 @@ namespace P2_AP1_BlayverthReyes.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Modelos", x => x.Id);
+                    table.PrimaryKey("PK_Pedidos", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -58,9 +58,9 @@ namespace P2_AP1_BlayverthReyes.Migrations
                 {
                     table.PrimaryKey("PK_PedidoDetalles", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_PedidoDetalles_Modelos_PedidoId",
+                        name: "FK_PedidoDetalles_Pedidos_PedidoId",
                         column: x => x.PedidoId,
-                        principalTable: "Modelos",
+                        principalTable: "Pedidos",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -70,9 +70,9 @@ namespace P2_AP1_BlayverthReyes.Migrations
                 columns: new[] { "ComponenteId", "Descripcion", "Existencia", "Precio" },
                 values: new object[,]
                 {
-                    { 1, "Memoria 4GB", 1, 1580m },
-                    { 2, "Disco SSD 120MB", 8, 4200m },
-                    { 3, "Tarjeta de Video", 4, 10000m }
+                    { 1, "Memoria 4GB", 1, 1580.0 },
+                    { 2, "Disco SSD 120MB", 8, 4200.0 },
+                    { 3, "Tarjeta de Video", 4, 10000.0 }
                 });
 
             migrationBuilder.CreateIndex(
@@ -91,7 +91,7 @@ namespace P2_AP1_BlayverthReyes.Migrations
                 name: "PedidoDetalles");
 
             migrationBuilder.DropTable(
-                name: "Modelos");
+                name: "Pedidos");
         }
     }
 }

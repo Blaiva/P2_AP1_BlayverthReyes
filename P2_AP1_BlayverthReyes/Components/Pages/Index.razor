@@ -1,7 +1,9 @@
 ﻿@page "/index"
 
-@inject PedidosService modelosService
+@inject PedidosService pedidosService
 @rendermode InteractiveServer
+
+<PageTitle>Index</PageTitle>
 
 <div class="container">
 	<div class="card shadow-lg">
@@ -48,7 +50,8 @@
 				<div class="col-3">
 					<InputSelect class="form-select" @bind-value="Filtro">
 						<option value="" selected disabled>Elige una opci&oacute;n</option>
-						<option value="Id">Id</option>
+						<option value="Cliente">Cliente</option>
+						<option value="Total">Total</option>
 					</InputSelect>
 				</div>
 
@@ -61,7 +64,7 @@
 				</div>
 
 				<div class="col-5">
-					<a href="/create" class="btn btn-primary"><span class="bi bi-plus-square" /> Crear</a>
+					<a href="/upsert/0" class="btn btn-primary"><span class="bi bi-plus-square" /> Crear</a>
 				</div>
 			</div>
 
@@ -72,19 +75,23 @@
 					<tr>
 						<th>Id</th>
 						<th>Fecha</th>
+						<th>Cliente</th>
+						<th>Total</th>
 						<th>Opciones</th>
 					</tr>
 				</thead>
 				@*Datos de la tabla*@
 				<tbody>
-					@foreach (var modelo in ListaModelos)
+					@foreach (var pedido in ListaPedidos)
 					{
 						<tr>
-							<td>@modelo.Id</td>
-							<td>@modelo.Fecha.ToString("dd/MM/yyyy")</td>
+							<td>@pedido.Id</td>
+							<td>@pedido.Fecha.ToString("dd/MM/yyyy")</td>
+							<td>@pedido.NombreCliente</td>
+							<td>@pedido.Total</td>
 
 							<td>
-								<a href="/create/@modelo.Id" class="btn btn-outline-primary"><span class="bi bi-pencil" /></a>
+								<a href="/upsert/@pedido.Id" class="btn btn-outline-primary"><span class="bi bi-pencil" /></a>
 							</td>
 						</tr>
 					}
@@ -94,13 +101,15 @@
 
 		@*Footer*@
 		<div class="card-footer">
-			<label><strong>Cantidad: </strong>@ListaModelos.Count()</label>
+			<div class="text-end">
+				<label><strong>Total: </strong>RD$@Math.Round(ListaPedidos.Sum(e => e.Total), 2)</label>
+			</div>
 		</div>
 	</div>
 </div>
 
 @code {
-	public List<Pedidos> ListaModelos { get; set; } = new List<Pedidos>();
+	public List<Pedidos> ListaPedidos { get; set; } = new List<Pedidos>();
 
 	public string Filtro { get; set; } = string.Empty;
 	public string ValorFiltro { get; set; } = string.Empty;
@@ -109,30 +118,32 @@
 
 	protected override async Task OnInitializedAsync()
 	{
-		ListaModelos = await modelosService.Listar(e => e.Id > 0);
+		ListaPedidos = await pedidosService.Listar(e => e.Id > 0);
 	}
 
 	public async Task Buscar()
 	{
 		if (ValorFiltro.Trim() != "" || (FechaDesde.HasValue || FechaHasta.HasValue))
 		{
-			if (Filtro == "Id")
-				ListaModelos = await modelosService.Listar(e => e.Id.ToString().Contains(ValorFiltro.Trim()));
+			if (Filtro == "Nombre")
+				ListaPedidos = await pedidosService.Listar(e => e.NombreCliente.ToLower().Contains(ValorFiltro.ToLower().Trim()));
+			else if(Filtro == "Total")
+				ListaPedidos = await pedidosService.Listar(e => e.Total.ToString().Contains(ValorFiltro.ToString().Trim()));
 
 			if (FechaDesde.HasValue && FechaHasta.HasValue)
-				ListaModelos = ListaModelos.Where(e => e.Fecha >= FechaDesde && e.Fecha <= FechaHasta).ToList();
+				ListaPedidos = ListaPedidos.Where(e => e.Fecha >= FechaDesde && e.Fecha <= FechaHasta).ToList();
 			else if (FechaDesde.HasValue)
-				ListaModelos = ListaModelos.Where(e => e.Fecha >= FechaDesde).ToList();
+				ListaPedidos = ListaPedidos.Where(e => e.Fecha >= FechaDesde).ToList();
 			else if (FechaHasta.HasValue)
-				ListaModelos = ListaModelos.Where(e => e.Fecha <= FechaHasta).ToList();
+				ListaPedidos = ListaPedidos.Where(e => e.Fecha <= FechaHasta).ToList();
 		}
 		else
-			ListaModelos = await modelosService.Listar(e => e.Id > 0);
+			ListaPedidos = await pedidosService.Listar(e => e.Id > 0);
 	}
 
 	public async Task Restablecer()
 	{
-		ListaModelos = await modelosService.Listar(e => e.Id > 0);
+		ListaPedidos = await pedidosService.Listar(e => e.Id > 0);
 		ValorFiltro = string.Empty;
 		Filtro = string.Empty;
 		FechaDesde = null;

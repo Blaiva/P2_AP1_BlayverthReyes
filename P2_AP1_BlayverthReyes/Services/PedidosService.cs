@@ -86,6 +86,12 @@ public class PedidosService(IDbContextFactory<Contexto> DbFactory)
         await using var contexto = await DbFactory.CreateDbContextAsync();
         return await contexto.Pedidos.Include(e => e.Detalles).Where(criterio).AsNoTracking().ToListAsync();
     }
+
+    public async Task<List<Componentes>> ListarComponentes()
+    {
+        await using var contexto = await DbFactory.CreateDbContextAsync();
+        return await contexto.Componentes.Where(c => c.ComponenteId > 0).AsNoTracking().ToListAsync();
+    }
 }
 
 public enum TipoOperacion

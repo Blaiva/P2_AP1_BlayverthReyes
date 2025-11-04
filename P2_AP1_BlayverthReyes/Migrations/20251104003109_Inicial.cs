@@ -20,7 +20,7 @@ namespace P2_AP1_BlayverthReyes.Migrations
                     ComponenteId = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Descripcion = table.Column<string>(type: "TEXT", nullable: false),
-                    Precio = table.Column<decimal>(type: "TEXT", nullable: false),
+                    Precio = table.Column<double>(type: "REAL", nullable: false),
                     Existencia = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
@@ -70,9 +70,9 @@ namespace P2_AP1_BlayverthReyes.Migrations
                 columns: new[] { "ComponenteId", "Descripcion", "Existencia", "Precio" },
                 values: new object[,]
                 {
-                    { 1, "Memoria 4GB", 1, 1580m },
-                    { 2, "Disco SSD 120MB", 8, 4200m },
-                    { 3, "Tarjeta de Video", 4, 10000m }
+                    { 1, "Memoria 4GB", 1, 1580.0 },
+                    { 2, "Disco SSD 120MB", 8, 4200.0 },
+                    { 3, "Tarjeta de Video", 4, 10000.0 }
                 });
 
             migrationBuilder.CreateIndex(
